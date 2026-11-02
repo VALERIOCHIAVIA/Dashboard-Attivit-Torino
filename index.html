@@ -38,4 +38,33 @@
 <div class="rowbar">Attività in reperibilità<div class="bar"><div class="fill" style="width:66%"></div></div><b>2</b></div>
 <div class="rowbar">Settimane Sud Ovest saltate<div class="bar"><div class="fill" style="width:33%;background:#8b5cf6"></div></div><b>1</b></div></section>
 <section class="panel wide summary"><h2>Sintesi gestionale</h2><b>Criticità principale: insufficienza di personale operativo.</b><ul><li>Annullamento completo manutenzione Vanchiglia CV.</li><li>Mancata esecuzione ordinaria del guasto Sabotino.</li><li>Mancata esecuzione ordinaria verifiche Montante Virgilio.</li><li>Ricorso potenziale alla reperibilità fuori orario per recuperare le attività extra.</li><li>Riallocazione di CILLI su Stura.</li></ul></section>
-</div><div class="footer">Dashboard HTML locale · Dati aggiornati manualmente · Versione settimana 45</div></main></html>
+</div></div><div class="footer">Dashboard Torino · Database Supabase · Versione settimana 45</div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://xkewwaysshjdxwoqzxas.supabase.co";
+const SUPABASE_KEY = "sb_publishable_1h1_jlmrcXfU5nt-B10aBw_u8Qbcm8p";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function verificaDatabase() {
+  const { data, error } = await supabase
+    .from("programmi")
+    .select("*");
+
+  if (error) {
+    console.error("Errore Supabase:", error);
+    return;
+  }
+
+  console.log("Connessione Supabase riuscita!", data);
+}
+
+verificaDatabase();
+</script>
+
+</html>
