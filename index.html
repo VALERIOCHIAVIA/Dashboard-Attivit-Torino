@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Torino O&M · Dashboard attività</title>
+<style>
+:root{--bg:#0b1220;--panel:#111c2e;--panel2:#17243a;--text:#e8eef8;--muted:#9fb0c8;--line:#2a3a54}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}
+header{background:#13233b;padding:22px max(20px,calc((100% - 1200px)/2));border-bottom:1px solid var(--line)}h1{margin:0 0 8px;font-size:25px}header p{margin:0;color:var(--muted)}
+main{max-width:1200px;margin:auto;padding:22px}.status{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:16px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .label{color:var(--muted);font-size:12px}.card .num{font-size:28px;font-weight:bold;margin:8px 0}
+.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}h2{font-size:17px;margin:0 0 14px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px}
+.tag{display:inline-block;border-radius:20px;padding:4px 8px;font-size:11px;background:#25344b;color:#cbd5e1}.red{background:#4b2028!important;color:#fecaca!important}.orange{background:#4b3518!important;color:#fde68a!important}.blue{background:#1e3a5f!important;color:#bfdbfe!important}.green{background:#153d2b!important;color:#bbf7d0!important}
+.event{border-left:3px solid #f59e0b;padding:10px 12px;margin:10px 0;background:var(--panel2);border-radius:0 8px 8px 0}.event p{margin:0;color:#cbd5e1;line-height:1.5}
+small,.muted{color:var(--muted)}footer{max-width:1200px;margin:auto;padding:20px;color:var(--muted);font-size:12px}
+.forms{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formgrid .wide{grid-column:1/-1}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border-radius:7px;border:1px solid var(--line);background:#0b1526;color:var(--text);font:inherit}
+textarea{min-height:75px;resize:vertical}button{padding:10px 14px;border:0;border-radius:7px;background:#2563eb;color:white;font-weight:bold;cursor:pointer}button.secondary{background:#334155}button:disabled{opacity:.5}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.layout,.forms{grid-template-columns:1fr}main{padding:14px}table{font-size:12px}}
+</style></head><body>
+<header><h1>⚡ Torino O&M · Dashboard attività</h1><p>Programmazione, carenze di personale e interventi fuori programma · Settimana 45/2026</p></header>
+<main><div id="connection" class="status">Verifica collegamento al database…</div>
+<section class="grid">
+<div class="card"><div class="label">ODM in archivio</div><div class="num" id="kpiProgrammi">—</div><span class="tag blue">Supabase</span></div>
+<div class="card"><div class="label">ODM annullati</div><div class="num" id="kpiAnnullati">—</div><span class="tag red">Stato</span></div>
+<div class="card"><div class="label">Eventi registrati</div><div class="num" id="kpiEventi">—</div><span class="tag orange">Registro</span></div>
+<div class="card"><div class="label">Ore impattate (eventi)</div><div class="num" id="kpiOre">—</div><span class="tag green">Totale</span></div></section>
+<div class="forms">
+<section class="panel"><h2>＋ Inserisci programma / ODM</h2><form id="programForm" class="formgrid">
+<div><label>Settimana (es. 45)</label><input name="settimana" required value="45"></div><div><label>Anno</label><input name="anno" type="number" required value="2026"></div>
+<div><label>ODM</label><input name="odm" required placeholder="180000000"></div><div><label>Squadra (opzionale)</label><input name="squadra" placeholder="Squadra A"></div>
+<div class="wide"><label>Descrizione attività</label><input name="descrizione" required placeholder="Cabina / lavorazione"></div>
+<div><label>Personale (n.)</label><input name="personale" type="number" min="0" placeholder="2"></div><div><label>Durata (ore)</label><input name="durata_ore" type="number" min="0" step=".5" placeholder="8"></div>
+<div><label>Stato</label><select name="stato"><option value="programmato">Programmato</option><option value="in corso">In corso</option><option value="completato">Completato</option><option value="annullato">Annullato</option><option value="parzialmente saltato">Parzialmente saltato</option></select></div>
+<div class="wide"><button type="submit">Salva programma</button></div></form></section>
+<section class="panel"><h2>＋ Registro evento / variazione</h2><form id="eventForm" class="formgrid">
+<div><label>Data evento</label><input name="data_evento" type="date" required></div><div><label>Settimana</label><input name="settimana" value="45"></div>
+<div><label>ODM (se applicabile)</label><input name="odm" placeholder="180000000"></div><div><label>Tipo evento</label><select name="tipo"><option>Assenza</option><option>Guasto</option><option>Annullamento</option><option>Riprogrammazione</option><option>Riposizionamento</option><option>Extra-programma</option><option>Altro</option></select></div>
+<div class="wide"><label>Descrizione</label><textarea name="descrizione" required placeholder="Cosa è successo / decisione"></textarea></div>
+<div class="wide"><label>Causa</label><input name="causa" placeholder="Es. carenza personale"></div>
+<div><label>Personale coinvolto</label><input name="personale_coinvolto" placeholder="Squadra / risorsa"></div><div><label>Ore impattate</label><input name="ore_impattate" type="number" min="0" step=".5"></div>
+<div class="wide"><button type="submit">Registra evento</button></div></form></section></div>
+<div class="layout"><section class="panel"><h2>Programmi salvati · Supabase</h2><div style="overflow:auto"><table><thead><tr><th>Settimana</th><th>ODM</th><th>Attività</th><th>Squadra</th><th>Ore</th><th>Stato</th></tr></thead><tbody id="programRows"><tr><td colspan="6">Caricamento…</td></tr></tbody></table></div></section>
+<section class="panel"><h2>Registro eventi · Supabase</h2><div id="eventRows">Caricamento…</div></section></div>
+<p class="muted">Aggiornamento automatico ogni 60 secondi. I dati inseriti vengono salvati nel database Supabase.</p>
+</main><footer>Torino O&M · Dashboard interna</footer>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const supabase=createClient('https://tllldthmleqwbiwqkqcb.supabase.co','sb_publishable_1h1_jlmrcXfU5nt-B1OaBw_u8Qbcm8p');
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function status(msg,ok=false){$('connection').textContent=(ok?'✓ ':'⚠ ')+msg;$('connection').style.color=ok?'#86efac':'#fbbf24'}
+async function refresh(){
+ const [p,e]=await Promise.all([supabase.from('programmi').select('*').order('id',{ascending:false}),supabase.from('eventi').select('*').order('data_evento',{ascending:false}).order('id',{ascending:false})]);
+ if(p.error||e.error){status('Errore lettura: '+(p.error?.message||e.error?.message));return}
+ const ps=p.data||[], es=e.data||[];
+ status('Supabase collegato · programmi ed eventi accessibili · aggiornamento '+new Date().toLocaleTimeString('it-IT'),true);
+ $('kpiProgrammi').textContent=ps.length;$('kpiAnnullati').textContent=ps.filter(x=>(x.stato||'').toLowerCase().includes('annull')).length;
+ $('kpiEventi').textContent=es.length;$('kpiOre').textContent=es.reduce((a,x)=>a+Number(x.ore_impattate||0),0).toLocaleString('it-IT');
+ $('programRows').innerHTML=ps.length?ps.map(x=>`<tr><td>${esc(x.settimana)}/${esc(x.anno)}</td><td>${esc(x.odm)}</td><td>${esc(x.descrizione)}</td><td>${esc(x.squadra||'—')}</td><td>${esc(x.durata_ore??'—')}</td><td><span class="tag ${String(x.stato).includes('annull')?'red':String(x.stato).includes('salt')?'orange':'blue'}">${esc(x.stato||'programmato')}</span></td></tr>`).join(''):'<tr><td colspan="6">Nessun programma in archivio.</td></tr>';
+ $('eventRows').innerHTML=es.length?es.map(x=>`<div class="event"><strong>${esc(x.tipo)} · ${esc(x.data_evento)} ${x.odm?'· ODM '+esc(x.odm):''}</strong><p>${esc(x.descrizione)}${x.causa?' · Causa: '+esc(x.causa):''}${x.ore_impattate?' · '+esc(x.ore_impattate)+' h':''}</p></div>`).join(''):'<p class="muted">Nessun evento registrato.</p>';
+}
+$('programForm').addEventListener('submit',async ev=>{ev.preventDefault();const f=new FormData(ev.target),d=Object.fromEntries(f.entries());d.anno=Number(d.anno);d.personale=d.personale?Number(d.personale):null;d.durata_ore=d.durata_ore?Number(d.durata_ore):null;
+ const b=ev.target.querySelector('button');b.disabled=true;const {error}=await supabase.from('programmi').insert(d);b.disabled=false;if(error){alert('Salvataggio non riuscito: '+error.message+'\\nVerificare policy INSERT/RLS.');return}ev.target.reset();ev.target.anno.value=2026;ev.target.settimana.value=45;await refresh();alert('Programma salvato!')});
+$('eventForm').data_evento.value=new Date().toISOString().slice(0,10);
+$('eventForm').addEventListener('submit',async ev=>{ev.preventDefault();const f=new FormData(ev.target),d=Object.fromEntries(f.entries());d.ore_impattate=d.ore_impattate?Number(d.ore_impattate):null;
+ const b=ev.target.querySelector('button');b.disabled=true;const {error}=await supabase.from('eventi').insert(d);b.disabled=false;if(error){alert('Salvataggio non riuscito: '+error.message+'\\nVerificare policy INSERT/RLS.');return}ev.target.reset();$('eventForm').data_evento.value=new Date().toISOString().slice(0,10);$('eventForm').settimana.value=45;await refresh();alert('Evento registrato!')});
+await refresh();setInterval(refresh,60000);
+</script></body></html>
